@@ -1,42 +1,11 @@
+local RunService = game:GetService("RunService")
+
 local TrainRate = 0.68
-local AutoTrain = true
 local TrainAmount = 20
-local commands = {}
-
-task.spawn(function()
-    while AutoTrain do
-        game:GetService("ReplicatedStorage").RemoteEvent.AddPowerEvent:FireServer("FromTraining",TrainAmount)
-        task.wait(TrainRate)
-        game:GetService("ReplicatedStorage").RemoteEvent.AddPowerEvent:FireServer("FromTraining",TrainAmount - 0.001)
-        task.wait(TrainRate)
-    end
-end)
-
-commands.trainrate = function(sender,args)
-	if tonumber(args[1]) then
-		TrainRate = tonumber(args[1])
-	end
-end
-
-game.Players.LocalPlayer.Chatted:Connect(function(msg)
-	msg = string.lower(msg)
-	local splitstring = msg:split(" ")
-	local slashcommand = splitstring[1]
-	local cmd = slashcommand:split("!")
-	local cmdname = cmd[2]
-	if commands[cmdname] then
-		local arguments = {}
-		for i = 2, #splitstring, 1 do
-			table.insert(arguments,splitstring[i])
-		end
-		commands[cmdname](game.Players.LocalPlayer,arguments)
-	end
-end)
-
-print("Executed AltTrain")
-
-
-
+local GuiUpdateRate = 30
+local ninTickTime = tick()
+local guiTickTime = tick()
+local lastNin = TrainAmount
 
 local Players = game:GetService("Players")
 
@@ -344,35 +313,37 @@ game.Players.LocalPlayer.leaderstats.Ninjutsu:GetPropertyChangedSignal("Value"):
     avgNin = sessionNin / numOfTimes
 end)
 
-
-task.spawn(function()
-    coroutine.resume(coroutine.create(function()
-        while task.wait(0.03) do
-            local tempTime = totalTime + workspace.DistributedGameTime
-            SessionTime.Text = convertToDHM(workspace.DistributedGameTime)
-            TotalTime.Text = convertToDHM(tempTime)
-            NinGained.Text = comma_value(sessionNin)
-            TotalNin.Text = comma_value(game.Players.LocalPlayer.leaderstats.Ninjutsu.Value)
-        end
-    end))
-    coroutine.resume(coroutine.create(function()
-        while task.wait(30) do
-            AvgNin.Text = Roundf(avgNin)
-            AvgInterval.Text = Roundf(avgInterval)
-            NinPerSec.Text = Roundf(avgNin / avgInterval)
-            NinPerDay.Text = comma_value(math.round((avgNin / avgInterval) * 60 * 60 * 24))
-        end
-    end))
-    coroutine.resume(coroutine.create(function()
-        while wait(300) do
-            saveSettings()
-        end
-    end))
-end)
-
 game.Players.PlayerRemoving:Connect(function()
     saveSettings()
 end)
+
+
+RunService.Heartbeat:Connect(function()
+    if (tick() - tickTime) >= TrainRate then
+        tickTime = tick()
+        if lastNin ~= TrainAmount then
+            game:GetService("ReplicatedStorage").RemoteEvent.AddPowerEvent:FireServer("FromTraining",TrainAmount)
+            lastNin = TrainAmount
+        else
+            game:GetService("ReplicatedStorage").RemoteEvent.AddPowerEvent:FireServer("FromTraining",TrainAmount - 0.001)
+            lastNin = TrainAmount - 0.001
+        end
+        local tempTime = totalTime + workspace.DistributedGameTime
+        SessionTime.Text = convertToDHM(workspace.DistributedGameTime)
+        TotalTime.Text = convertToDHM(tempTime)
+        NinGained.Text = comma_value(sessionNin)
+        TotalNin.Text = comma_value(game.Players.LocalPlayer.leaderstats.Ninjutsu.Value)
+    end
+    if (tick() - guiTickTime) >= GuiUpdateRate then
+        guiTickTime = tick()
+        AvgNin.Text = Roundf(avgNin)
+        AvgInterval.Text = Roundf(avgInterval)
+        NinPerSec.Text = Roundf(avgNin / avgInterval)
+        NinPerDay.Text = comma_value(math.round((avgNin / avgInterval) * 60 * 60 * 24))
+    end
+end)
+
+print("Executed AltTrain")
 
 
 
