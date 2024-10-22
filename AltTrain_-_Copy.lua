@@ -319,8 +319,8 @@ end)
 
 
 RunService.Heartbeat:Connect(function()
-    if (tick() - tickTime) >= TrainRate then
-        tickTime = tick()
+    if (tick() - ninTickTime) >= TrainRate then
+        ninTickTime = tick()
         if lastNin ~= TrainAmount then
             game:GetService("ReplicatedStorage").RemoteEvent.AddPowerEvent:FireServer("FromTraining",TrainAmount)
             lastNin = TrainAmount
