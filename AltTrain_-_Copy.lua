@@ -73,6 +73,32 @@ if help then
     game.Players.LocalPlayer.Backpack:FindFirstChild("Train").Parent = game.Players.LocalPlayer.Character
 end
 
+local firstTrial = {"SurfaceGui", "ImageLabel", "BodyVelocity", "TextLabel", "BillboardGui", "ScreenGui", "Frame", "Mesh", "SpecialMesh", "Sound", "Pants", "Shirt", "ParticleEmitter", "Trail", "Explosion", "Decal", "FaceControls", "WrapTarget", "Accessory", 'ForceField', 'Sparkles', 'Smoke', 'Fire'}
+local secondTrial = {"Tool","Player","Model","Part","UnionOperation","MeshPart","CornerWedgePart","TrussPart","BasePart"}
+local ancestors = {"CoreGui", "CorePackages", "ReplicatedStorage", "ReplicatedFirst", "StarterGui", "StarterPack", "StarterPlayer", "PlayerGui", "PlayerScripts", "Chat"}
+
+local function ServiceCheck(child)
+    local success,err = pcall(function()
+        if game:GetService(child.Name) then
+            return
+        end
+    end)
+    if success then
+        return true
+    else
+        return false
+    end
+end
+
+local function AncestorCheck(child)
+    for _,v in pairs(ancestors) do
+        if child:FindFirstAncestor(v) then
+            return true
+        end
+    end
+    return false
+end
+
 
 local Lighting = game:GetService("Lighting")
 local Terrain = workspace:FindFirstChildOfClass('Terrain')
@@ -96,22 +122,72 @@ for i,v in pairs(game:GetDescendants()) do
         v.BlastRadius = 1
     end
 end
+task.wait(0.5)
+for _,child in pairs(game:GetDescendants()) do
+    if not AncestorCheck(child) and not ServiceCheck(child) then
+        if table.find(firstTrial,child.ClassName) then
+            child:Destroy()
+        elseif table.find(secondTrial,child.ClassName) then
+            if child.Name ~= Players.LocalPlayer.Name and not child:FindFirstAncestor(Players.LocalPlayer.Name) and child.Name ~= "PRIMPART" then
+                child:Destroy()
+            end
+        end
+    end
+end
 for i,v in pairs(Lighting:GetDescendants()) do
     if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
         v.Enabled = false
+        v:Destroy()
     end
 end
-workspace.DescendantAdded:Connect(function(child)
+game.DescendantAdded:Connect(function(child)
     task.spawn(function()
-        if child:IsA('ForceField') then
-            RunService.Heartbeat:Wait()
-            child:Destroy()
-        elseif child:IsA('Sparkles') then
-            RunService.Heartbeat:Wait()
-            child:Destroy()
-        elseif child:IsA('Smoke') or child:IsA('Fire') then
-            RunService.Heartbeat:Wait()
-            child:Destroy()
-        end
+        pcall(function()
+            if not AncestorCheck(child) and not ServiceCheck(child) then
+                if table.find(firstTrial,child.ClassName) then
+                    RunService.Heartbeat:Wait()
+                    child:Destroy()
+                elseif table.find(secondTrial,child.ClassName) then
+                    if child.Name ~= Players.LocalPlayer.Name and not child:FindFirstAncestor(Players.LocalPlayer.Name) and child.Name ~= "PRIMPART" then
+                        RunService.Heartbeat:Wait()
+                        child:Destroy()
+                    end
+                end
+            end
+        end)
     end)
 end)
+
+
+
+local newPart = Instance.new("Part",workspace)
+newPart.CFrame = CFrame.new(-285, 339, -47)
+newPart.Anchored = true
+newPart.Name = "PRIMPART"
+
+Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(newPart.Position + Vector3.new(0,2,0))
+
+task.wait(0.5)
+
+for _,v in pairs(Players.LocalPlayer.Backpack:GetDescendants()) do
+    if v:IsA("Mesh") or v:IsA("SpecialMesh") or v:IsA("Attachment") or v:IsA("Trail") or v:IsA("Fire") then
+        v:Destroy()
+    elseif v:IsA("BasePart") then
+        v.Transparency = 1
+    end
+end
+for _,v in pairs(Players.LocalPlayer.Character:GetDescendants()) do
+    if v:IsA("Pants") or v:IsA("Shirt") then
+        v:Destroy()
+    elseif v:IsA("BasePart") then
+        v.Transparency = 1
+    end
+end
+
+task.wait(0.5)
+
+Players.LocalPlayer.Backpack.Sword.Parent = Players.LocalPlayer.Character
+task.wait(0.1)
+Players.LocalPlayer.Character.Sword.Parent = Players.LocalPlayer.Backpack
+task.wait(0.1)
+Players.LocalPlayer.Backpack.Train.Parent = Players.LocalPlayer.Character
