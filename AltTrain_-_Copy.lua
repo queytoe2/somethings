@@ -172,15 +172,11 @@ task.wait(0.5)
 for _,v in pairs(Players.LocalPlayer.Backpack:GetDescendants()) do
     if v:IsA("Mesh") or v:IsA("SpecialMesh") or v:IsA("Attachment") or v:IsA("Trail") or v:IsA("Fire") then
         v:Destroy()
-    elseif v:IsA("BasePart") then
-        v.Transparency = 1
     end
 end
 for _,v in pairs(Players.LocalPlayer.Character:GetDescendants()) do
     if v:IsA("Pants") or v:IsA("Shirt") then
         v:Destroy()
-    elseif v:IsA("BasePart") then
-        v.Transparency = 1
     end
 end
 
@@ -195,13 +191,13 @@ Players.LocalPlayer.Backpack.Train.Parent = Players.LocalPlayer.Character
 task.wait(0.5)
 
 local newGui = Instance.new("ScreenGui",Players.LocalPlayer.PlayerGui)
-newGui.Name = "BLACKSCREEN"
+newGui.Name = "WHITECREEN"
 newGui.IgnoreGuiInset = true
 newGui.ResetOnSpawn = false
 newGui.Enabled = true
 
 local newFrame = Instance.new("Frame",newGui)
-newFrame.BackgroundColor3 = Color3.new(0,0,0)
+newFrame.BackgroundColor3 = Color3.new(1,1,1)
 newFrame.AnchorPoint = Vector2.new(0.5,0.5)
 newFrame.Position = UDim2.new(0.5,0,0.5,0)
 newFrame.Size = UDim2.new(5,0,5,0)
