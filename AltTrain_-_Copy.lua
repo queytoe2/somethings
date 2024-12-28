@@ -191,3 +191,17 @@ task.wait(0.1)
 Players.LocalPlayer.Character.Sword.Parent = Players.LocalPlayer.Backpack
 task.wait(0.1)
 Players.LocalPlayer.Backpack.Train.Parent = Players.LocalPlayer.Character
+
+task.wait(0.5)
+
+local newGui = Instance.new("ScreenGui",Players.LocalPlayer.PlayerGui)
+newGui.Name = "BLACKSCREEN"
+newGui.IgnoreGuiInset = true
+newGui.ResetOnSpawn = false
+newGui.Enabled = true
+
+local newFrame = Instance.new("Frame",newGui)
+newFrame.BackgroundColor3 = Color3.new(0,0,0)
+newFrame.AnchorPoint = Vector2.new(0.5,0.5)
+newFrame.Position = UDim2.new(0.5,0,0.5,0)
+newFrame.Size = UDim2.new(5,0,5,0)
